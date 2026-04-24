@@ -28,7 +28,7 @@ function CustomMapControls() {
   const map = useMap();
 
   return (
-    <div className="absolute right-4 top-1/2 -translate-y-1/2 z-[1000] flex flex-col gap-3">
+    <div className="absolute right-4 top-1/2 -translate-y-1/2 z-1000 flex flex-col gap-3">
       {/* Zoom com Cores Sólidas e Contraste */}
       <div className="bg-slate-900 border border-slate-700 p-1 rounded-xl flex flex-col gap-1 shadow-2xl">
         <button 
@@ -38,7 +38,7 @@ function CustomMapControls() {
         >
           <Plus size={20} />
         </button>
-        <div className="h-[1px] bg-slate-700 mx-2" />
+        <div className="h-1px bg-slate-700 mx-2" />
         <button 
           onClick={() => map.zoomOut()}
           className="p-2 text-slate-200 hover:bg-slate-800 rounded-lg transition-all active:scale-95"

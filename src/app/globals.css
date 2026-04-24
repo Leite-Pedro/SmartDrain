@@ -1,31 +1,36 @@
-@import url('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
+@import url("https://unpkg.com/leaflet@1.9.4/dist/leaflet.css");
 @import "tailwindcss";
 
 @theme {
-
 }
 
 /* CORES PARA MODO CLARO */
 :root {
-  --bg-color: #f1f5f9;      /* Cinza bem claro */
-  --surface-color: #ffffff;  /* Branco */
-  --text-color: #0f172a;     /* Azul quase preto */
-  --border-color: #e2e8f0;   /* Cinza claro */
+  --bg-color: #f8fafc; /* Cinza bem claro */
+  --surface-color: #ffffff; /* Branco */
+  --text-color: #0f172a; /* Azul quase preto */
+  --border-color: transparent; /* Cinza claro */
 }
 
 /* CORES PARA MODO ESCURO */
 .dark {
-  --bg-color: #020617;      /* Seu Azul Petróleo/Preto original */
-  --surface-color: #0f172a;  /* Azul Petróleo médio */
-  --text-color: #f8fafc;     /* Branco gelo */
-  --border-color: #1e293b;   /* Cinza azulado escuro */
+  --bg-color: #020617; /* Seu Azul Petróleo/Preto original */
+  --surface-color: #0f172a; /* Azul Petróleo médio */
+  --text-color: #f8fafc; /* Branco gelo */
+  --border-color: transparent;
 }
 
 /* Aplicando ao Body */
-body {
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  transition: all 0.3s ease;
+@layer base {
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    transition:
+      background-color 0.3s ease,
+      color 0.3s ease;
+  }
 }
 
 /* Fix do Mapa */
@@ -34,4 +39,6 @@ body {
   height: 100% !important;
   z-index: 1;
 }
-.leaflet-control-zoom { display: none !important; }
+.leaflet-control-zoom {
+  display: none !important;
+}

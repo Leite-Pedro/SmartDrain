@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-// Aqui importamos o componente que você criou no arquivo ThemeProvider
-import { ThemeProvider } from "@/components/ThemeProvider"; 
+import { ThemeProvider } from "@/components/ThemeProvider";
+import Sidebar from "@/components/Sidebar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,18 +26,21 @@ export default function RootLayout({
 }>) {
   return (
     // O suppressHydrationWarning é necessário para não dar erro de conflito de cores no console
-    <html lang="pt-br" suppressHydrationWarning> 
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {/* O ThemeProvider deve "embrulhar" o {children}. 
-          Tudo o que estiver dentro dele passará a respeitar o tema claro/escuro.
-        */}
+    <html lang="pt-br" className="dark" suppressHydrationWarning>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex h-screen`} //bg-slate-950
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
           enableSystem={false}
           disableTransitionOnChange
         >
-          {children}
+          {/* Agora a Sidebar está embrulhada pelo tema */}
+          <Sidebar />
+
+          {/* O main abre, o conteúdo entra, o main fecha */}
+          <main className="flex-1 h-full overflow-y-auto">{children}</main>
         </ThemeProvider>
       </body>
     </html>
