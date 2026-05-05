@@ -10,7 +10,6 @@ import {
   Activity,
 } from "lucide-react";
 
-// 1. Tipagem para os dados do dispositivo
 interface Dispositivo {
   id: string;
   localizacao: string;
@@ -20,7 +19,6 @@ interface Dispositivo {
   ultimaAtualizacao: string;
 }
 
-// 2. Dados Simulados para a Feira de Tecnologia
 const mockDispositivos: Dispositivo[] = [
   {
     id: "SD-BUEIRO-01",

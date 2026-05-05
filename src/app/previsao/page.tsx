@@ -13,7 +13,6 @@ import {
   Legend,
 } from "recharts";
 
-// Dados simulados para Santa Rita do Sapucaí
 const dadosClima = [
   { dia: "Seg", volume: 15, probabilidade: 80, temp: 24 },
   { dia: "Ter", volume: 35, probabilidade: 95, temp: 22 }, // Dia de alerta
