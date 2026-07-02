@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   Cpu,
   CloudRain,
+  UserPlus, // Novo ícone importado para o cadastro
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -79,15 +80,28 @@ export default function Sidebar() {
         </Link>
 
         <Link
-          href="/configuracoes" // 1. Mude de "/" para "/configuracoes"
+          href="/configuracoes"
           className={`flex items-center gap-3 p-3 rounded-xl transition-all ${
-            pathname === "/configuracoes" // 2. Adicione a lógica de cor ativa
+            pathname === "/configuracoes"
               ? "bg-blue-600/10 text-blue-600 font-bold border border-blue-600/20"
               : "text-slate-400 hover:bg-app-bg opacity-70 hover:opacity-100"
           }`}
         >
           <Settings size={20} />
           <span>Configurações</span>
+        </Link>
+
+        {/* NOVO MENU: Cadastro de Usuários (App Mobile) */}
+        <Link
+          href="/usuarios"
+          className={`flex items-center gap-3 p-3 rounded-xl transition-all ${
+            pathname === "/usuarios"
+              ? "bg-blue-600/10 text-blue-600 font-bold border border-blue-600/20"
+              : "text-slate-400 hover:bg-app-bg opacity-70 hover:opacity-100"
+          }`}
+        >
+          <UserPlus size={20} />
+          <span>Credenciais do App</span>
         </Link>
       </nav>
     </aside>
