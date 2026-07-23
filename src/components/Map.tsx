@@ -16,22 +16,22 @@ interface BueiroData {
   };
   distancia_media_cm: number;
   capacidade_porcentagem: number;
-  status_codigo: "TRANQUILO" | "ALERTA" | "CRITICO";
+  status_codigo: "TRANQUILO" | "ALERTA" | "CRITICO" | "ENCHENTE";
   status_mensagem: string;
   status_bateria: number;
   timestamp: string;
 }
 
-// Declaração da Tipagem da Prop que vem do page.tsx
 interface MapProps {
   bueiros: BueiroData[];
 }
 
 const getMarkerIcon = (status: string) => {
-  let color = "blue";
+  let color = "green";
   if (status === "TRANQUILO") color = "green";
   if (status === "ALERTA") color = "gold";
   if (status === "CRITICO") color = "red";
+  if (status === "ENCHENTE") color = "blue";
 
   return new L.Icon({
     iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${color}.png`,
@@ -59,31 +59,26 @@ function MapResizer() {
 
 function CustomMapControls() {
   const map = useMap();
-
   return (
     <div className="absolute right-4 top-1/2 -translate-y-1/2 z-[1000] flex flex-col gap-3">
       <div className="bg-slate-900 border border-slate-700 p-1 rounded-xl flex flex-col gap-1 shadow-2xl">
         <button
           onClick={() => map.zoomIn()}
-          className="p-2 text-slate-200 hover:bg-slate-800 rounded-lg transition-all active:scale-95"
-          title="Aumentar Zoom"
+          className="p-2 text-slate-200 hover:bg-slate-800 rounded-lg"
         >
           <Plus size={20} />
         </button>
         <div className="h-[1px] bg-slate-700 mx-2" />
         <button
           onClick={() => map.zoomOut()}
-          className="p-2 text-slate-200 hover:bg-slate-800 rounded-lg transition-all active:scale-95"
-          title="Diminuir Zoom"
+          className="p-2 text-slate-200 hover:bg-slate-800 rounded-lg"
         >
           <Minus size={20} />
         </button>
       </div>
-
       <button
         onClick={() => map.setView(TARGET_COORDS, 17, { animate: true })}
-        className="bg-blue-600 hover:bg-blue-500 p-3 rounded-xl text-white shadow-2xl transition-all active:scale-90 border border-blue-400"
-        title="Centralizar no Ponto"
+        className="bg-blue-600 hover:bg-blue-500 p-3 rounded-xl text-white shadow-2xl"
       >
         <LocateFixed size={22} />
       </button>
@@ -107,7 +102,8 @@ export default function Map({ bueiros }: MapProps) {
 
         {bueiros.map((bueiro) => (
           <Marker
-            key={bueiro.bueiro_id}
+            // 🚀 KEY DINÂMICA: Força a atualização do ícone no Leaflet quando o status altera
+            key={`${bueiro.bueiro_id}-${bueiro.status_codigo}-${bueiro.capacidade_porcentagem}`}
             position={[bueiro.latitude, bueiro.longitude] as [number, number]}
             icon={getMarkerIcon(bueiro.status_codigo)}
           >
@@ -120,11 +116,13 @@ export default function Map({ bueiros }: MapProps) {
                   Status:{" "}
                   <span
                     className={
-                      bueiro.status_codigo === "CRITICO"
-                        ? "text-red-600"
-                        : bueiro.status_codigo === "ALERTA"
-                          ? "text-yellow-600"
-                          : "text-green-600"
+                      bueiro.status_codigo === "ENCHENTE"
+                        ? "text-blue-600 font-bold"
+                        : bueiro.status_codigo === "CRITICO"
+                          ? "text-red-600"
+                          : bueiro.status_codigo === "ALERTA"
+                            ? "text-yellow-600"
+                            : "text-green-600"
                     }
                   >
                     {bueiro.status_codigo}
