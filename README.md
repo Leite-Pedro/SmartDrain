@@ -1,23 +1,51 @@
-# Smart Drain
+# 🌊 SmartDrain — Sistema Inteligente de Monitoramento de Bueiros
 
-O **Smart Drain** é um sistema de bueiros inteligentes projetado para monitorar o acúmulo de água e resíduos em tempo real, ajudando a prevenir enchentes urbanas.
-
----
-
-## Como o Sistema Funciona?
-
-1. **Hardware (ESP32 LilyGo):** 3 sensores de nível instalados no bueiro fazem a medição e enviam os dados via rede móvel 4G.
-2. **Backend (Python/Flask):** Recebe os dados através de um broker MQTT (HiveMQ) e os salva em um banco de dados MySQL.
-3. **Frontend (Next.js):** Um painel web dinâmico que mostra a situação das ruas em tempo real e emite alertas de criticidade.
+O **SmartDrain** é uma solução para prevenção de enchentes urbanas através do monitoramento em tempo real do nível de água e obstrução em bueiros inteligentes.
 
 ---
 
-## Principais Tecnologias
+## 🚀 Estrutura do Projeto
 
-- **Microcontrolador:** ESP32 LilyGo (com conexão 4G)
-- **Comunicação:** Protocolo MQTT (HiveMQ)
-- **Backend:** Flask (Python) & Banco MySQL
-- **Frontend:** Next.js & Tailwind CSS
+O repositório está dividido em duas partes principais:
+
+### 🎨 Frontend (`/frontend` ou raiz)
+
+- Desenvolvido em **Next.js / React** e **Tailwind CSS**.
+- Dashboard interativo para visualização de dados, mapas e relatórios de medição.
+
+### ⚙️ Backend & Simulador (`/backend`)
+
+- Desenvolvido em **Python** (`app.py`).
+- **API / Simulador**: Envia e processa dados simulados dos sensores do bueiro inteligente via MQTT / HTTP.
+
+---
+
+## 🛠️ Tecnologias Utilizadas
+
+- **Frontend:** Next.js, React, Tailwind CSS, Recharts
+- **Backend:** Python, Flask / FastAPI
+- **Comunicação / IoT:** Protocolo MQTT / JSON
+
+---
+
+## 🧰 Como Executar o Projeto
+
+### 1. Backend & Simulador
+
+```bash
+cd backend
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python app.py
+```
+
+### 2. Frontend
+
+```bash
+npm install
+npm run dev
+```
 
 ---
 
