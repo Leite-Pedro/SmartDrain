@@ -1,26 +1,26 @@
-# 🌊 SmartDrain — Sistema Inteligente de Monitoramento de Bueiros
+# SmartDrain — Sistema Inteligente de Monitoramento de Bueiros
 
 O **SmartDrain** é uma solução para prevenção de enchentes urbanas através do monitoramento em tempo real do nível de água e obstrução em bueiros inteligentes.
 
 ---
 
-## 🚀 Estrutura do Projeto
+## Estrutura do Projeto
 
 O repositório está dividido em duas partes principais:
 
-### 🎨 Frontend (`/frontend` ou raiz)
+### Frontend (`/frontend` ou raiz)
 
 - Desenvolvido em **Next.js / React** e **Tailwind CSS**.
 - Dashboard interativo para visualização de dados, mapas e relatórios de medição.
 
-### ⚙️ Backend & Simulador (`/backend`)
+### Backend & Simulador (`/backend`)
 
 - Desenvolvido em **Python** (`app.py`).
 - **API / Simulador**: Envia e processa dados simulados dos sensores do bueiro inteligente via MQTT / HTTP.
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 - **Frontend:** Next.js, React, Tailwind CSS, Recharts
 - **Backend:** Python, Flask / FastAPI
@@ -28,7 +28,7 @@ O repositório está dividido em duas partes principais:
 
 ---
 
-## 🧰 Como Executar o Projeto
+## Como Executar o Projeto
 
 ### 1. Backend & Simulador
 
