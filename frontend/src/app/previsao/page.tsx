@@ -61,7 +61,10 @@ export default function PrevisaoTempo() {
             const dataObjeto = new Date(dataStr + "T12:00:00"); // Evita problemas de fuso horário local
             return {
               dia: diasSemana[dataObjeto.getDay()],
-              volume: Math.round(data.daily.precipitation_sum[index]),
+              // 🚀 CORREÇÃO 1: Preserva casas decimais para chuvas leves não virarem 0
+              volume: Number(
+                (data.daily.precipitation_sum[index] ?? 0).toFixed(1),
+              ),
               probabilidade: data.daily.precipitation_probability_max[index],
               temp: Math.round(data.daily.temperature_2m_max[index]),
             };
@@ -77,7 +80,7 @@ export default function PrevisaoTempo() {
             diaCritico = dataObjeto.toLocaleDateString("pt-BR", {
               weekday: "long",
             });
-            volumeCritico = Math.round(data.daily.precipitation_sum[i]);
+            volumeCritico = Number(data.daily.precipitation_sum[i].toFixed(1));
             break;
           }
         }
@@ -184,13 +187,14 @@ export default function PrevisaoTempo() {
                 />
                 <Legend wrapperStyle={{ paddingTop: "10px" }} />
 
-                {/* Barras dinâmicas do volume de chuva real */}
+                {/* 🚀 CORREÇÃO 2: minPointSize={2} garante visibilidade mínima das barras */}
                 <Bar
                   yAxisId="left"
                   dataKey="volume"
                   fill="#3b82f6"
                   name="Volume (mm)"
                   radius={[4, 4, 0, 0]}
+                  minPointSize={2}
                 />
 
                 {/* Linha dinâmica da probabilidade real de chuva */}

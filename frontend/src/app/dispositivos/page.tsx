@@ -63,7 +63,8 @@ export default function Dispositivos() {
   };
 
   // Traduz o texto da API em nível matemático para preencher a barra de progresso visual
-  const getSignalPercentage = (texto: string) => {
+  const getSignalPercentage = (texto?: string) => {
+    if (!texto) return 0;
     if (texto.includes("Excelente")) return 100;
     if (texto.includes("Boa")) return 75;
     if (texto.includes("Aceitável")) return 50;
@@ -99,12 +100,13 @@ export default function Dispositivos() {
         </div>
       </div>
 
-      {/* Grid Dinâmico: Se houver 5 bueiros, gera 5 cards. Se houver 10, gera 10. */}
+      {/* Grid Dinâmico */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {dispositivos.map((disp) => {
           // Processamentos visuais individuais por card
           const signalLevel = getSignalPercentage(disp.qualidade_conexao);
-          const sinalTexto = disp.qualidade_conexao.split(" ")[0]; // Extrai só a primeira palavra (Ex: "Excelente")
+          const sinalTexto =
+            disp.qualidade_conexao?.split(" ")[0] ?? "Indisponível";
           const statusVis = getStatusDisplay(disp.status_codigo);
           const horaUltimoPing = new Date(disp.timestamp).toLocaleTimeString();
 
@@ -143,7 +145,6 @@ export default function Dispositivos() {
                       {disp.status_bateria}%
                     </span>
                   </div>
-                  {/* Barra de Progresso Bateria */}
                   <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden">
                     <div
                       className={`h-2.5 rounded-full transition-all duration-500 ${getProgressColor(disp.status_bateria)}`}
@@ -172,7 +173,6 @@ export default function Dispositivos() {
                       {sinalTexto}
                     </span>
                   </div>
-                  {/* Barra de Progresso Sinal */}
                   <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden">
                     <div
                       className={`h-2.5 rounded-full transition-all duration-500 ${getProgressColor(signalLevel)}`}
