@@ -64,6 +64,20 @@ quanto ao restaurar a sessão salva. As rotas de limpeza exigem
 `Authorization: Bearer <token>`; 401 vira `SessaoExpirada`, que limpa a sessão e
 volta para o login.
 
+## Se um dia houver versão iOS
+
+O projeto é Android-only — não existe pasta `ios/`. Ao gerar uma com
+`flutter create .`, o Info.plist precisa das justificativas de permissão, senão
+a Apple recusa o app na revisão:
+
+```xml
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>Precisamos da sua localização para mostrar os bueiros próximos e liberar o início da limpeza.</string>
+
+<key>NSCameraUsageDescription</key>
+<string>Precisamos da câmera para registrar a foto de finalização da limpeza.</string>
+```
+
 ## Antes de publicar
 
 - `applicationId` ainda é `com.example.smart_drain_funcionario` — a Play recusa
