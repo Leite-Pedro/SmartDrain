@@ -1,0 +1,42 @@
+name: smart_drain_funcionario
+description: App do funcionário de limpeza - Smart Drain (monitoramento de bueiros)
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+
+  # Rede
+  http: ^1.2.0
+
+  # Mapa leve (OpenStreetMap, sem precisar de API Key do Google)
+  flutter_map: ^6.1.0
+  latlong2: ^0.9.1
+
+  # Localização em tempo real e cálculo de distância
+  geolocator: ^11.0.0
+
+  # Câmera / foto de finalização
+  image_picker: ^1.1.2
+
+  # Persistência simples do token de login
+  shared_preferences: ^2.2.3
+
+  # Permissões (câmera / localização)
+  permission_handler: ^11.3.1
+
+  # Abrir app de navegação externo (opcional, "Como chegar")
+  url_launcher: ^6.3.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
