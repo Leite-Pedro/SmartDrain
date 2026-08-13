@@ -325,7 +325,7 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
       children: [
         TileLayer(
           urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-          userAgentPackageName: 'com.smartdrain.funcionario',
+          userAgentPackageName: 'io.github.leitepedro.smartdrain',
         ),
         MarkerLayer(
           markers: [

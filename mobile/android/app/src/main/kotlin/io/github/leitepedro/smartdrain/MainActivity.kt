@@ -1,4 +1,4 @@
-package com.example.smart_drain_funcionario
+package io.github.leitepedro.smartdrain
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -1,0 +1,6 @@
+# Copie para android/key.properties e preencha. NUNCA versione o arquivo real
+# nem o .jks: quem tiver os dois pode publicar atualizações no lugar de vocês.
+storePassword=
+keyPassword=
+keyAlias=smartdrain
+storeFile=../smartdrain-release.jks
