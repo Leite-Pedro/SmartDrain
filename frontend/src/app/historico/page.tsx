@@ -1,4 +1,5 @@
 "use client";
+import { API } from "@/lib/api";
 
 import {
   BarChart,
@@ -62,7 +63,7 @@ export default function Historico() {
       try {
         // Busca os dados da Janela de 6 meses
         const resGraficos = await fetch(
-          "http://127.0.0.1:5000/api/historico/graficos",
+          `${API}/api/historico/graficos`,
         );
         if (resGraficos.ok) {
           const jsonGraficos = await resGraficos.json();
@@ -71,7 +72,7 @@ export default function Historico() {
 
         // Busca os dados da Tabela de Auditoria com filtro de Mês/Ano
         const resAuditoria = await fetch(
-          `http://127.0.0.1:5000/api/historico/auditoria?mes=${mesSelecionado}&ano=${anoSelecionado}`,
+          `${API}/api/historico/auditoria?mes=${mesSelecionado}&ano=${anoSelecionado}`,
         );
         if (resAuditoria.ok) {
           const jsonAuditoria = await resAuditoria.json();

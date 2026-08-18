@@ -1,4 +1,5 @@
 "use client";
+import { API } from "@/lib/api";
 
 import { useState, useEffect } from "react";
 import {
@@ -31,7 +32,7 @@ export default function Dispositivos() {
     const fetchDadosReais = async () => {
       try {
         const response = await fetch(
-          "http://127.0.0.1:5000/api/bueiros/tempo-real",
+          `${API}/api/bueiros/tempo-real`,
         );
         if (response.ok) {
           const data = await response.json();
