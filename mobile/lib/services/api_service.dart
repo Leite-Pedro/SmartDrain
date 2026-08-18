@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/bueiro.dart';
 import '../models/usuario.dart';
 
@@ -15,14 +16,57 @@ class SessaoExpirada implements Exception {
 }
 
 /// Centraliza todas as chamadas HTTP para o backend Flask (monólito).
-///
-/// IMPORTANTE: ajuste [baseUrl] para o endereço real da sua API.
-/// - Emulador Android acessando um Flask rodando no mesmo PC: 10.0.2.2
-/// - Celular físico: use o IP da máquina na rede local (ex: http://192.168.0.10:5000)
 class ApiService {
-  // 10.0.2.2 = alias do emulador Android para o localhost da máquina host.
-  // Celular físico: troque pelo IP do notebook na rede (ipconfig -> IPv4).
-  static const String baseUrl = 'http://10.0.2.2:5001';
+  /// Endereço da API. Configurável pelo app (engrenagem na tela de login),
+  /// porque o IP do servidor muda a cada rede — sem isso seria preciso
+  /// recompilar o APK para cada demonstração ou aparelho.
+  static String baseUrl = enderecoPadrao;
+
+  /// 10.0.2.2 é o alias do emulador Android para o localhost do computador.
+  /// Em celular físico é preciso trocar pelo IP do servidor na rede.
+  static const String enderecoPadrao = 'http://10.0.2.2:5001';
+
+  static const String _chaveEndereco = 'api_base_url';
+
+  /// Chamado na abertura do app, antes de qualquer requisição.
+  static Future<void> carregarEndereco() async {
+    final prefs = await SharedPreferences.getInstance();
+    baseUrl = prefs.getString(_chaveEndereco) ?? enderecoPadrao;
+  }
+
+  static Future<void> salvarEndereco(String endereco) async {
+    final prefs = await SharedPreferences.getInstance();
+    final limpo = normalizarEndereco(endereco);
+    await prefs.setString(_chaveEndereco, limpo);
+    baseUrl = limpo;
+  }
+
+  /// Aceita "192.168.0.10:5001" ou "http://192.168.0.10:5001/" e devolve sempre
+  /// no formato que o http espera. Digitar o endereço na rua, de dedo grosso,
+  /// erra em barra e esquema — é mais barato corrigir do que reclamar.
+  static String normalizarEndereco(String bruto) {
+    var texto = bruto.trim();
+    if (!texto.startsWith('http://') && !texto.startsWith('https://')) {
+      texto = 'http://$texto';
+    }
+    while (texto.endsWith('/')) {
+      texto = texto.substring(0, texto.length - 1);
+    }
+    return texto;
+  }
+
+  /// Bate na API só para dizer se aquele endereço responde, sem alterar nada.
+  static Future<bool> testarEndereco(String endereco) async {
+    try {
+      final resposta = await http
+          .get(Uri.parse(
+              '${normalizarEndereco(endereco)}/api/bueiros/tempo-real'))
+          .timeout(const Duration(seconds: 6));
+      return resposta.statusCode == 200;
+    } catch (_) {
+      return false;
+    }
+  }
 
   /// Sem isso, uma API fora do ar deixa a requisição pendurada e a tela em
   /// loading infinito — o pacote http não tem timeout padrão.
@@ -40,18 +84,22 @@ class ApiService {
   // LOGIN
   // ---------------------------------------------------------------------
   static Future<Usuario> login(String email, String senha) async {
-    final resposta = await http.post(
-      Uri.parse('$baseUrl/api/login'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'email': email, 'password': senha}),
-    ).timeout(_tempoLimite);
+    final resposta = await http
+        .post(
+          Uri.parse('$baseUrl/api/login'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({'email': email, 'password': senha}),
+        )
+        .timeout(_tempoLimite);
 
     if (resposta.statusCode == 200) {
-      return Usuario.fromJson(jsonDecode(resposta.body) as Map<String, dynamic>);
+      return Usuario.fromJson(
+          jsonDecode(resposta.body) as Map<String, dynamic>);
     } else if (resposta.statusCode == 401) {
       throw Exception('E-mail ou senha inválidos.');
     } else {
-      throw Exception('Não foi possível conectar ao servidor. Tente novamente.');
+      throw Exception(
+          'Não foi possível conectar ao servidor. Tente novamente.');
     }
   }
 
@@ -65,7 +113,9 @@ class ApiService {
 
     if (resposta.statusCode == 200) {
       final List dados = jsonDecode(resposta.body) as List;
-      return dados.map((item) => Bueiro.fromJson(item as Map<String, dynamic>)).toList();
+      return dados
+          .map((item) => Bueiro.fromJson(item as Map<String, dynamic>))
+          .toList();
     } else if (resposta.statusCode == 404) {
       return [];
     } else {
@@ -83,20 +133,23 @@ class ApiService {
     required double latitude,
     required double longitude,
   }) async {
-    final resposta = await http.post(
-      Uri.parse('$baseUrl/api/limpeza/iniciar'),
-      headers: _cabecalhos,
-      body: jsonEncode({
-        'bueiro_id': bueiroId,
-        'funcionario_id': funcionarioId,
-        'latitude': latitude,
-        'longitude': longitude,
-        'timestamp': DateTime.now().toIso8601String(),
-      }),
-    ).timeout(_tempoLimite);
+    final resposta = await http
+        .post(
+          Uri.parse('$baseUrl/api/limpeza/iniciar'),
+          headers: _cabecalhos,
+          body: jsonEncode({
+            'bueiro_id': bueiroId,
+            'funcionario_id': funcionarioId,
+            'latitude': latitude,
+            'longitude': longitude,
+            'timestamp': DateTime.now().toIso8601String(),
+          }),
+        )
+        .timeout(_tempoLimite);
 
     if (resposta.statusCode == 401) {
-      throw SessaoExpirada(_mensagemDeErro(resposta.body) ?? 'Sessão expirada.');
+      throw SessaoExpirada(
+          _mensagemDeErro(resposta.body) ?? 'Sessão expirada.');
     }
     if (resposta.statusCode != 200 && resposta.statusCode != 201) {
       throw Exception(_mensagemDeErro(resposta.body) ??
@@ -126,7 +179,8 @@ class ApiService {
       ..files.add(await http.MultipartFile.fromPath('foto', foto.path));
 
     // Prazo maior: aqui sobe a foto da limpeza.
-    final resposta = await requisicao.send().timeout(const Duration(seconds: 60));
+    final resposta =
+        await requisicao.send().timeout(const Duration(seconds: 60));
 
     if (resposta.statusCode != 200 && resposta.statusCode != 201) {
       final corpo = await resposta.stream.bytesToString();

@@ -27,7 +27,14 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
   final MapController _mapController = MapController();
 
   Position? _posicaoAtual;
-  List<Bueiro> _bueirosProximos = [];
+
+  /// Todos os bueiros da região, limpos ou não — são estes que viram pinos no
+  /// mapa, para bater com o que a dashboard mostra na mesma hora.
+  List<Bueiro> _bueirosNaRegiao = [];
+
+  /// A fila de trabalho: só o que precisa de limpeza. Alimenta a lista e a contagem.
+  List<Bueiro> get _bueirosProximos =>
+      _bueirosNaRegiao.where((b) => b.precisaLimpeza).toList();
   bool _carregando = true;
   String? _erro;
   Timer? _timerAtualizacao;
@@ -98,7 +105,6 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
       final todos = await ApiService.obterBueirosTempoReal();
 
       final proximos = todos.where((b) {
-        if (!b.precisaLimpeza) return false;
         final distancia = LocationService.distanciaEmMetros(
           latOrigem: _posicaoAtual!.latitude,
           lngOrigem: _posicaoAtual!.longitude,
@@ -126,7 +132,7 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
 
       if (!mounted) return;
       setState(() {
-        _bueirosProximos = proximos;
+        _bueirosNaRegiao = proximos;
         _carregando = false;
         _erro = null;
       });
@@ -325,7 +331,7 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
       children: [
         TileLayer(
           urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-          userAgentPackageName: 'com.smartdrain.funcionario',
+          userAgentPackageName: 'io.github.leitepedro.smartdrain',
         ),
         MarkerLayer(
           markers: [
@@ -335,7 +341,7 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
               height: 22,
               child: const _MarcadorFuncionario(),
             ),
-            ..._bueirosProximos.map(
+            ..._bueirosNaRegiao.map(
               (b) => Marker(
                 point: latlng.LatLng(b.latitude, b.longitude),
                 width: 34,

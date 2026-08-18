@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_drain_funcionario/models/bueiro.dart';
+import 'package:smart_drain_funcionario/services/api_service.dart';
 import 'package:smart_drain_funcionario/widgets/bueiro_card.dart';
 
 /// Resposta de /api/bueiros/tempo-real, como o backend devolve de verdade.
@@ -23,6 +24,7 @@ Map<String, dynamic> _json({
 }
 
 void main() {
+  _testesEndereco();
   group('Bueiro.fromJson', () {
     test('lê a resposta da API', () {
       final b = Bueiro.fromJson(_json());
@@ -56,9 +58,11 @@ void main() {
   });
 
   group('precisaLimpeza', () {
-    test('ALERTA e CRITICO precisam', () {
+    test('ALERTA, CRITICO e ENCHENTE precisam', () {
       expect(Bueiro.fromJson(_json(status: 'ALERTA')).precisaLimpeza, isTrue);
       expect(Bueiro.fromJson(_json(status: 'CRITICO')).precisaLimpeza, isTrue);
+      // O pior caso de todos: já ficou de fora da lista uma vez.
+      expect(Bueiro.fromJson(_json(status: 'ENCHENTE')).precisaLimpeza, isTrue);
     });
 
     test('TRANQUILO não precisa', () {
@@ -103,6 +107,35 @@ void main() {
         (tester) async {
       await montar(tester, distancia: 120);
       expect(tester.getSize(find.byType(BueiroCard)).height, greaterThan(60));
+    });
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Endereço do servidor, digitado à mão pelo funcionário na rua.
+// ---------------------------------------------------------------------------
+void _testesEndereco() {
+  group('normalizarEndereco', () {
+    test('coloca http:// quando falta', () {
+      expect(ApiService.normalizarEndereco('192.168.0.10:5001'),
+          'http://192.168.0.10:5001');
+    });
+
+    test('mantém https quando informado', () {
+      expect(ApiService.normalizarEndereco('https://api.exemplo.com'),
+          'https://api.exemplo.com');
+    });
+
+    test('tira barra do fim, senão a URL vira //api/login', () {
+      expect(ApiService.normalizarEndereco('http://10.0.2.2:5001/'),
+          'http://10.0.2.2:5001');
+      expect(ApiService.normalizarEndereco('10.0.2.2:5001///'),
+          'http://10.0.2.2:5001');
+    });
+
+    test('ignora espaços colados no começo e no fim', () {
+      expect(ApiService.normalizarEndereco('  10.0.2.2:5001  '),
+          'http://10.0.2.2:5001');
     });
   });
 }

@@ -569,7 +569,16 @@ def obter_tabela_auditoria():
             "timestamp": a.timestamp
         })
  
-    auditoria_ordenada = sorted(auditoria, key=lambda x: x['timestamp'], reverse=True)
+    def _ordenavel(item):
+        # historico_manutencoes grava sem fuso e telemetria_bueiros com fuso.
+        # Misturar os dois num sorted() levanta TypeError e derruba a rota, entao
+        # os com fuso viram horario local sem tzinfo, alinhando com os outros.
+        instante = item['timestamp']
+        if instante.tzinfo is not None:
+            instante = instante.astimezone().replace(tzinfo=None)
+        return instante
+
+    auditoria_ordenada = sorted(auditoria, key=_ordenavel, reverse=True)
  
     for item in auditoria_ordenada:
         del item['timestamp']
@@ -578,5 +587,10 @@ def obter_tabela_auditoria():
  
 if __name__ == '__main__':
     # Porta via env porque a 5000 já está ocupada por outro serviço neste notebook.
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True, threaded=True, use_reloader=False)
+    # debug desligado por padrao: em apresentacao ele so atrapalha — qualquer
+    # excecao vira stack trace na tela e o processo fica mais fragil.
+    # Para desenvolver: defina FLASK_DEBUG=1 no .env
+    depurar = os.environ.get('FLASK_DEBUG', '0') == '1'
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)),
+            debug=depurar, threaded=True, use_reloader=False)
  

@@ -3,7 +3,7 @@ class Bueiro {
   final double latitude;
   final double longitude;
   final double capacidadePorcentagem;
-  final String statusCodigo; // TRANQUILO | ALERTA | CRITICO
+  final String statusCodigo; // TRANQUILO | ALERTA | CRITICO | ENCHENTE
   final String statusMensagem;
   final String statusBateria;
   final String qualidadeConexao;
@@ -35,5 +35,8 @@ class Bueiro {
     );
   }
 
-  bool get precisaLimpeza => statusCodigo == 'ALERTA' || statusCodigo == 'CRITICO';
+  /// Pela negativa de propósito: listar os códigos que precisam de limpeza já
+  /// deixou ENCHENTE (bueiro transbordando, o caso mais grave) de fora uma vez.
+  /// Qualquer status novo do backend entra na fila até alguém dizer o contrário.
+  bool get precisaLimpeza => statusCodigo != 'TRANQUILO';
 }
