@@ -1,4 +1,5 @@
 "use client";
+import { API } from "@/lib/api";
 
 import { useState, useEffect } from "react";
 import {
@@ -24,7 +25,7 @@ export default function CadastroUsuarios() {
   // 1. CARREGAR DADOS: Busca os usuários diretamente da API Flask ao abrir a página
   useEffect(() => {
     setIsMounted(true);
-    fetch("http://localhost:5000/api/usuarios")
+    fetch(`${API}/api/usuarios`)
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {
@@ -46,7 +47,7 @@ export default function CadastroUsuarios() {
     };
 
     try {
-      const resposta = await fetch("http://localhost:5000/api/usuarios", {
+      const resposta = await fetch(`${API}/api/usuarios`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(novoUsuario),
@@ -89,7 +90,7 @@ export default function CadastroUsuarios() {
     if (confirmar) {
       try {
         const resposta = await fetch(
-          `http://localhost:5000/api/usuarios/${id}`,
+          `${API}/api/usuarios/${id}`,
           {
             method: "DELETE",
           },

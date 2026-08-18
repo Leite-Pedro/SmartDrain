@@ -1,4 +1,5 @@
 "use client";
+import { API } from "@/lib/api";
 
 import { useState, useEffect } from "react";
 import { Settings, Bell, Zap, Droplets, Save, Loader2 } from "lucide-react";
@@ -13,7 +14,7 @@ export default function Configuracoes() {
     const buscarConfiguracoes = async () => {
       try {
         // Substitua pela rota real da sua API Flask
-        const response = await fetch("http://localhost:5000/api/configuracoes");
+        const response = await fetch(`${API}/api/configuracoes`);
         if (response.ok) {
           const data = await response.json();
           // Exemplo de retorno da API: { limite_alerta: 65 }
@@ -35,7 +36,7 @@ export default function Configuracoes() {
   const salvarConfiguracoes = async () => {
     setSalvando(true);
     try {
-      const response = await fetch("http://localhost:5000/api/configuracoes", {
+      const response = await fetch(`${API}/api/configuracoes`, {
         method: "POST", // ou PUT, dependendo de como você criar no Flask
         headers: {
           "Content-Type": "application/json",
@@ -65,7 +66,7 @@ export default function Configuracoes() {
     ) {
       try {
         const response = await fetch(
-          "http://localhost:5000/api/comandos/tempestade",
+          `${API}/api/comandos/tempestade`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },

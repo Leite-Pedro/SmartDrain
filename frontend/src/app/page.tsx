@@ -1,4 +1,5 @@
 "use client";
+import { API } from "@/lib/api";
 
 import { ThemeToggle } from "@/components/ThemeToggle";
 import dynamic from "next/dynamic";
@@ -32,7 +33,7 @@ export default function Home() {
       try {
         // 🚀 EVITA CACHE DO NAVEGADOR
         const response = await fetch(
-          `http://127.0.0.1:5000/api/bueiros/tempo-real?_t=${Date.now()}`,
+          `${API}/api/bueiros/tempo-real?_t=${Date.now()}`,
           { cache: "no-store" },
         );
         if (response.ok) {

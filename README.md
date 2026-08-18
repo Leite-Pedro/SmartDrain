@@ -43,9 +43,25 @@ python app.py
 ### 2. Frontend
 
 ```bash
+cd frontend
 npm install
 npm run dev
 ```
+
+A dashboard precisa saber onde a API está. Crie `frontend/.env.local`:
+
+```
+NEXT_PUBLIC_API_URL=http://127.0.0.1:5001
+```
+
+Esse arquivo não é versionado (`.env*` está no `.gitignore`), então cada um cria
+o seu. Sem ele, o padrão é `http://127.0.0.1:5000`.
+
+Para consumir a API que roda em **outro computador** da mesma rede — útil quando
+só uma pessoa sobe o backend e as outras querem ver a dashboard — use o IP da
+máquina dela no lugar de `127.0.0.1`. Três coisas costumam atrapalhar: o firewall
+precisa liberar a porta, os dois têm que estar na mesma rede, e uma dashboard
+servida em `https://` não consegue chamar um endereço `http://`.
 
 ---
 
