@@ -2,10 +2,15 @@ import 'package:flutter/material.dart';
 import 'models/usuario.dart';
 import 'screens/login_screen.dart';
 import 'screens/map_screen.dart';
+import 'services/api_service.dart';
 import 'services/auth_service.dart';
 import 'theme/app_theme.dart';
 
-void main() {
+void main() async {
+  // O endereço da API é configurável no app, então precisa estar carregado
+  // antes de qualquer tela tentar uma requisição.
+  WidgetsFlutterBinding.ensureInitialized();
+  await ApiService.carregarEndereco();
   runApp(const SmartDrainApp());
 }
 
@@ -65,7 +70,8 @@ class _TelaInicialState extends State<_TelaInicial> {
           child: SizedBox(
             height: 26,
             width: 26,
-            child: CircularProgressIndicator(strokeWidth: 2.4, color: AppColors.sinal),
+            child: CircularProgressIndicator(
+                strokeWidth: 2.4, color: AppColors.sinal),
           ),
         ),
       );

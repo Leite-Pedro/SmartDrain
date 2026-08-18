@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/dialogo_servidor.dart';
 import 'map_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -69,6 +70,20 @@ class _LoginScreenState extends State<LoginScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const _FaixaSinalizacao(),
+                    // Endereço do servidor: discreto, mas alcançável sem
+                    // recompilar o app quando a rede muda.
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 12, top: 8),
+                        child: IconButton(
+                          tooltip: 'Endereço do servidor',
+                          icon: const Icon(Icons.dns_outlined,
+                              color: AppColors.fumaca, size: 22),
+                          onPressed: () => DialogoServidor.abrir(context),
+                        ),
+                      ),
+                    ),
                     // Expanded + Spacer empurram o formulário para a metade de
                     // baixo: o app é usado em pé, de uma mão, e o botão precisa
                     // estar ao alcance do polegar.
