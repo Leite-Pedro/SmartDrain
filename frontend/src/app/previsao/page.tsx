@@ -7,7 +7,10 @@ import {
   Wind,
   ThermometerSun,
   AlertTriangle,
+  Waves,
+  Mountain,
 } from "lucide-react";
+import { API } from "@/lib/api";
 import {
   XAxis,
   YAxis,
@@ -27,6 +30,24 @@ interface DiaClima {
   temp: number;
 }
 
+interface BueiroRisco {
+  bueiro_id: string;
+  risco: number;
+  nivel: "ALTO" | "MEDIO" | "BAIXO";
+  altitude_m: number | null;
+  capacidade_porcentagem: number;
+  fator_terreno: number;
+  motivo: string;
+}
+
+interface Previsao {
+  bueiros: BueiroRisco[];
+  chuva_24h_mm: number;
+  chuva_72h_mm: number;
+  terreno_disponivel: boolean;
+  chuva_disponivel: boolean;
+}
+
 interface EstadoClima {
   historicoSemanal: DiaClima[];
   tempAtual: number;
@@ -36,9 +57,23 @@ interface EstadoClima {
   alertaVolume: number;
 }
 
+// "bueiro_centro_03" não é nome de lugar nenhum.
+function nomeLegivel(id: string) {
+  const partes = id.split("_");
+  return partes.length >= 3 ? `${partes[1]} ${partes[2]}`.toUpperCase() : id.toUpperCase();
+}
+
+const CORES_NIVEL: Record<string, string> = {
+  ALTO: "bg-red-500/10 text-red-500 border-red-500/20",
+  MEDIO: "bg-amber-500/10 text-amber-500 border-amber-500/20",
+  BAIXO: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
+};
+
 export default function PrevisaoTempo() {
   const [clima, setClima] = useState<EstadoClima | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [previsao, setPrevisao] = useState<Previsao | null>(null);
+  const [erroPrevisao, setErroPrevisao] = useState<string | null>(null);
 
   // Coordenadas fixas de Santa Rita do Sapucaí
   const LAT_SRS = -22.2514;
@@ -101,6 +136,26 @@ export default function PrevisaoTempo() {
     };
 
     buscarDadosMeteorologicos();
+  }, []);
+
+  // O ranking vem da API, não daqui: o app do funcionário lê o mesmo endpoint e
+  // os dois precisam mostrar a mesma ordem de atendimento. A obstrução muda a
+  // cada leitura do sensor, então recarrega sozinho.
+  useEffect(() => {
+    const buscarRisco = async () => {
+      try {
+        const r = await fetch(`${API}/api/previsao/risco`);
+        setPrevisao(await r.json());
+        setErroPrevisao(null);
+      } catch (error) {
+        console.error("Erro ao buscar o risco de alagamento:", error);
+        // Sem isso a seção fica em "calculando..." para sempre com a API fora.
+        setErroPrevisao(`Sem resposta da API em ${API}.`);
+      }
+    };
+    buscarRisco();
+    const id = setInterval(buscarRisco, 15000);
+    return () => clearInterval(id);
   }, []);
 
   if (loading) {
@@ -262,6 +317,101 @@ export default function PrevisaoTempo() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Onde vai alagar primeiro */}
+      <div className="mt-6 bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl">
+        <div className="flex items-start justify-between gap-4 mb-1">
+          <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+            <Waves className="text-blue-600" size={20} />
+            Onde vai alagar primeiro
+          </h2>
+          {previsao && (
+            <p className="text-xs text-slate-500 text-right">
+              {previsao.chuva_24h_mm.toFixed(1)} mm previstos em 24 h
+              <span className="mx-1">·</span>
+              {previsao.chuva_72h_mm.toFixed(1)} mm em 72 h
+            </p>
+          )}
+        </div>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">
+          Pesos: obstrução medida agora 45%, altitude do terreno 35%, chuva
+          prevista 20%. A água corre para o ponto mais baixo, então o mesmo
+          entupimento pesa mais embaixo do que em cima.
+        </p>
+
+        {previsao && !previsao.terreno_disponivel && (
+          <p className="text-xs text-amber-500 mb-4">
+            Sem altitude do terreno agora — o ranking está saindo só pela
+            obstrução e pela chuva.
+          </p>
+        )}
+
+        {erroPrevisao ? (
+          <p className="text-sm text-red-500">{erroPrevisao}</p>
+        ) : !previsao ? (
+          <p className="text-slate-500 animate-pulse text-sm">
+            Calculando o risco por bueiro...
+          </p>
+        ) : previsao.bueiros.length === 0 ? (
+          <p className="text-slate-500 text-sm">Nenhuma telemetria recebida ainda.</p>
+        ) : (
+          <ol className="space-y-3">
+            {previsao.bueiros.map((b, i) => (
+              <li
+                key={b.bueiro_id}
+                className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50"
+              >
+                <span className="text-2xl font-black text-slate-300 dark:text-slate-700 w-8 text-center shrink-0">
+                  {i + 1}
+                </span>
+
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="font-bold text-slate-800 dark:text-slate-200">
+                      {nomeLegivel(b.bueiro_id)}
+                    </p>
+                    <span
+                      className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full border ${CORES_NIVEL[b.nivel]}`}
+                    >
+                      {b.nivel}
+                    </span>
+                    {b.altitude_m !== null && (
+                      <span className="text-xs text-slate-400 flex items-center gap-1">
+                        <Mountain size={12} />
+                        {b.altitude_m.toFixed(0)} m
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 first-letter:uppercase">
+                    {b.motivo}
+                  </p>
+                  <div className="h-1.5 mt-2 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+                    <div
+                      className={`h-full rounded-full ${
+                        b.nivel === "ALTO"
+                          ? "bg-red-500"
+                          : b.nivel === "MEDIO"
+                            ? "bg-amber-500"
+                            : "bg-emerald-500"
+                      }`}
+                      style={{ width: `${b.risco}%` }}
+                    />
+                  </div>
+                </div>
+
+                <div className="text-right shrink-0">
+                  <p className="text-2xl font-black text-slate-800 dark:text-slate-200 tabular-nums">
+                    {b.risco.toFixed(0)}
+                  </p>
+                  <p className="text-[10px] text-slate-400 uppercase font-bold">
+                    risco
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        )}
       </div>
     </div>
   );
