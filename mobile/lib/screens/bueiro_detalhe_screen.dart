@@ -15,7 +15,12 @@ import '../widgets/medidor_nivel.dart';
 import 'login_screen.dart';
 
 /// Raio de proximidade que libera o botão de iniciar a limpeza.
-const double _raioLiberacaoMetros = 3;
+///
+/// 15 m, não 3: o erro típico de um GPS de celular em rua fica entre 5 e 15 m, e
+/// piora perto de prédio. Com 3 m o funcionário fica em cima do bueiro e o botão
+/// não destrava — reprova trabalho legítimo por ruído de sinal. A trava que vale
+/// é a do servidor (RAIO_LIMPEZA_METROS), que ninguém contorna mexendo no app.
+const double _raioLiberacaoMetros = 15;
 
 enum _EtapaLimpeza { aproximando, prontoParaIniciar, emAndamento, enviandoFinalizacao, concluida }
 
@@ -150,11 +155,7 @@ class _BueiroDetalheScreenState extends State<BueiroDetalheScreen> {
 
   Color get _corStatus => AppColors.doStatus(widget.bueiro.statusCodigo);
 
-  String get _nome {
-    final partes = widget.bueiro.bueiroId.split('_');
-    if (partes.length < 3) return widget.bueiro.bueiroId.toUpperCase();
-    return '${partes[1]} ${partes[2]}'.toUpperCase();
-  }
+  String get _nome => widget.bueiro.nomeLegivel;
 
   @override
   Widget build(BuildContext context) {

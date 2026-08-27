@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_drain_funcionario/models/bueiro.dart';
+import 'package:smart_drain_funcionario/models/previsao.dart';
 import 'package:smart_drain_funcionario/services/api_service.dart';
 import 'package:smart_drain_funcionario/widgets/bueiro_card.dart';
 
@@ -67,6 +68,43 @@ void main() {
 
     test('TRANQUILO não precisa', () {
       expect(Bueiro.fromJson(_json(status: 'TRANQUILO')).precisaLimpeza, isFalse);
+    });
+  });
+
+  group('regiao', () {
+    test('sai do meio do id', () {
+      expect(Bueiro.fromJson(_json()).regiao, 'centro');
+    });
+
+    test('id fora do padrão não derruba o filtro', () {
+      final b = Bueiro.fromJson(_json()..['bueiro_id'] = 'avulso');
+      expect(b.regiao, 'outros');
+      expect(b.nomeLegivel, 'AVULSO');
+    });
+  });
+
+  group('PrevisaoAlagamento.fromJson', () {
+    test('lê o ranking e aponta o primeiro da fila', () {
+      final p = PrevisaoAlagamento.fromJson({
+        'chuva_24h_mm': 12,
+        'bueiros': [
+          {
+            'bueiro_id': 'bueiro_centro_03',
+            'risco': 78.2,
+            'nivel': 'ALTO',
+            'motivo': 'ponto mais baixo da região',
+          },
+          {'bueiro_id': 'bueiro_centro_01', 'risco': 30.0, 'nivel': 'BAIXO'},
+        ],
+      });
+      expect(p.chuva24hMm, 12.0); // int do JSON não pode virar crash
+      expect(p.maisArriscado!.bueiroId, 'bueiro_centro_03');
+      expect(p.bueiros.last.motivo, ''); // campo ausente vira vazio, não null
+    });
+
+    test('resposta vazia não tem primeiro da fila', () {
+      final p = PrevisaoAlagamento.fromJson({'chuva_24h_mm': 0, 'bueiros': []});
+      expect(p.maisArriscado, isNull);
     });
   });
 
