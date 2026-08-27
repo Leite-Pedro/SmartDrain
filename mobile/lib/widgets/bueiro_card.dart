@@ -25,12 +25,7 @@ class BueiroCard extends StatelessWidget {
     return '${(distanciaMetros! / 1000).toStringAsFixed(1)} km';
   }
 
-  /// "bueiro_centro_02" não é como o funcionário chama a coisa na rua.
-  String get _nome {
-    final partes = bueiro.bueiroId.split('_');
-    if (partes.length < 3) return bueiro.bueiroId.toUpperCase();
-    return '${partes[1]} ${partes[2]}'.toUpperCase();
-  }
+  String get _nome => bueiro.nomeLegivel;
 
   @override
   Widget build(BuildContext context) {

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/bueiro.dart';
+import '../models/previsao.dart';
 import '../models/usuario.dart';
 
 /// Backend recusou o token (401). Tentar de novo não adianta: quem trata precisa
@@ -120,6 +121,28 @@ class ApiService {
       return [];
     } else {
       throw Exception('Falha ao carregar os bueiros da região.');
+    }
+  }
+
+  // ---------------------------------------------------------------------
+  // PREVISÃO DE ALAGAMENTO
+  // ---------------------------------------------------------------------
+  /// Ranking de risco calculado pela API.
+  ///
+  /// Devolve null em vez de levantar quando não dá para saber — API antiga sem a
+  /// rota, servidor fora, ou o Open-Meteo inacessível. É informação a mais: o
+  /// aviso simplesmente não aparece, e a lista de limpeza continua igual. Errar
+  /// aqui não pode tirar o funcionário do trabalho dele.
+  static Future<PrevisaoAlagamento?> obterPrevisaoAlagamento() async {
+    try {
+      final resposta = await http
+          .get(Uri.parse('$baseUrl/api/previsao/risco'))
+          .timeout(_tempoLimite);
+      if (resposta.statusCode != 200) return null;
+      return PrevisaoAlagamento.fromJson(
+          jsonDecode(resposta.body) as Map<String, dynamic>);
+    } catch (_) {
+      return null;
     }
   }
 

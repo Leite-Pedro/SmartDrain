@@ -39,4 +39,16 @@ class Bueiro {
   /// deixou ENCHENTE (bueiro transbordando, o caso mais grave) de fora uma vez.
   /// Qualquer status novo do backend entra na fila até alguém dizer o contrário.
   bool get precisaLimpeza => statusCodigo != 'TRANQUILO';
+
+  /// O id chega como "bueiro_centro_02" — é o único rótulo que o backend manda,
+  /// então região e nome saem dele. Id fora do padrão cai em 'outros' em vez de
+  /// estourar: bueiro cadastrado torto ainda precisa aparecer na lista.
+  List<String> get _partes => bueiroId.split('_');
+
+  String get regiao => _partes.length >= 2 ? _partes[1] : 'outros';
+
+  /// "bueiro_centro_02" não é como o funcionário chama a coisa na rua.
+  String get nomeLegivel => _partes.length >= 3
+      ? '${_partes[1]} ${_partes[2]}'.toUpperCase()
+      : bueiroId.toUpperCase();
 }
