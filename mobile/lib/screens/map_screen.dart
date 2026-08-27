@@ -369,13 +369,18 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
     );
   }
 
-  /// Quadrado e chapado como o resto do app; laranja de sinalização quando ligado.
+  /// Quadrado e chapado como o resto do app; piche quando ligado.
+  ///
+  /// Piche, e não o laranja de sinalização: o acento marca *uma* coisa, o botão
+  /// que inicia a limpeza. Com os chips laranja também, a mesma coluna da tela
+  /// tinha quatro elementos laranja e o acento parava de significar ação. Preto
+  /// sobre branco continua deixando óbvio qual filtro está ligado sem disputar.
   Widget _chip(String rotulo, bool ligado, VoidCallback aoTocar) {
     return Padding(
       padding: const EdgeInsets.only(right: 8, top: 4, bottom: 4),
       child: Material(
-        color: ligado ? AppColors.sinal : AppColors.superficie,
-        shape: Border.all(color: ligado ? AppColors.sinal : AppColors.borda),
+        color: ligado ? AppColors.piche : AppColors.superficie,
+        shape: Border.all(color: ligado ? AppColors.piche : AppColors.borda),
         child: InkWell(
           onTap: aoTocar,
           child: Container(
@@ -384,7 +389,7 @@ class _MapScreenState extends State<MapScreen> with WidgetsBindingObserver {
             child: Text(
               rotulo,
               style: AppText.rotulo.copyWith(
-                color: ligado ? AppColors.piche : AppColors.fumaca,
+                color: ligado ? Colors.white : AppColors.fumaca,
               ),
             ),
           ),
