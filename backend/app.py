@@ -18,6 +18,7 @@ from itsdangerous import BadSignature, SignatureExpired
 from sqlalchemy import text
 from dotenv import load_dotenv
 from models import db, Usuario, Telemetria, Manutencao, BueiroCadastro
+import previsao
 
 load_dotenv()
 
@@ -251,44 +252,83 @@ except Exception as e:
     traceback.print_exc()
  
  
+BUEIROS_PADRAO = [
+    "bueiro_centro_01",
+    "bueiro_centro_02",
+    "bueiro_centro_03",
+    "bueiro_centro_04",
+    "bueiro_centro_05"
+]
+
+
+def ultimas_leituras():
+    """A telemetria mais recente de cada bueiro conhecido.
+
+    Conhecido = os cinco fixos mais qualquer id que já apareceu no banco, para
+    que um bueiro novo comece a responder assim que publicar a primeira leitura,
+    sem precisar cadastrar nada aqui.
+
+    Usada pela rota de tempo real e pela de previsão: as duas precisam da mesma
+    foto do agora, e duas consultas separadas acabariam divergindo.
+    """
+    ids_no_banco = [row[0] for row in db.session.query(Telemetria.bueiro_id).distinct().all()]
+    leituras = []
+    for b_id in sorted(set(BUEIROS_PADRAO + ids_no_banco)):
+        ultima = Telemetria.query.filter_by(bueiro_id=b_id).order_by(Telemetria.timestamp.desc()).first()
+        if ultima:
+            leituras.append(ultima)
+    return leituras
+
+
+@app.route('/api/previsao/risco', methods=['GET', 'OPTIONS'])
+def obter_previsao_risco():
+    """Onde vai alagar primeiro: ranking de risco por bueiro.
+
+    Cruza o que o sensor mede agora com o relevo e a chuva prevista. A conta mora
+    em previsao.py; aqui só entra a foto do banco. Consumida pela dashboard e
+    pelo app — os dois precisam ver o mesmo ranking, senão não dá para discutir
+    qual bueiro atender primeiro.
+    """
+    try:
+        bueiros = [
+            {
+                "bueiro_id": l.bueiro_id,
+                "latitude": l.latitude,
+                "longitude": l.longitude,
+                "capacidade_porcentagem": l.capacidade_porcentagem,
+            }
+            for l in ultimas_leituras()
+            if l.latitude is not None and l.longitude is not None
+        ]
+        return jsonify(previsao.calcular(bueiros)), 200
+    except Exception as e:
+        return jsonify({"erro": str(e)}), 500
+
+
 @app.route('/api/bueiros/tempo-real', methods=['GET', 'OPTIONS'])
 def get_bueiros_tempo_real():
     try:
-        bueiros_ids = [
-            "bueiro_centro_01",
-            "bueiro_centro_02",
-            "bueiro_centro_03",
-            "bueiro_centro_04",
-            "bueiro_centro_05"
-        ]
- 
-        ids_no_banco = [row[0] for row in db.session.query(Telemetria.bueiro_id).distinct().all()]
-        todos_bueiros = sorted(list(set(bueiros_ids + ids_no_banco)))
- 
         resultado = []
- 
-        for b_id in todos_bueiros:
-            ultima_leitura = Telemetria.query.filter_by(bueiro_id=b_id).order_by(Telemetria.timestamp.desc()).first()
- 
-            if ultima_leitura:
-                resultado.append({
-                    "bueiro_id": ultima_leitura.bueiro_id,
-                    "latitude": ultima_leitura.latitude,
-                    "longitude": ultima_leitura.longitude,
-                    "sensores": {
-                        "sensor_1_cm": ultima_leitura.sensor_1_cm,
-                        "sensor_2_cm": ultima_leitura.sensor_2_cm,
-                        "sensor_3_cm": ultima_leitura.sensor_3_cm
-                    },
-                    "distancia_media_cm": ultima_leitura.distancia_media_cm,
-                    "capacidade_porcentagem": ultima_leitura.capacidade_porcentagem,
-                    "status_codigo": ultima_leitura.status_codigo,
-                    "status_mensagem": ultima_leitura.status_mensagem,
-                    "status_bateria": ultima_leitura.status_bateria,
-                    "qualidade_conexao": getattr(ultima_leitura, 'qualidade_conexao', 'Boa (Estável)'),
-                    "timestamp": ultima_leitura.timestamp.isoformat()
-                })
- 
+
+        for ultima_leitura in ultimas_leituras():
+            resultado.append({
+                "bueiro_id": ultima_leitura.bueiro_id,
+                "latitude": ultima_leitura.latitude,
+                "longitude": ultima_leitura.longitude,
+                "sensores": {
+                    "sensor_1_cm": ultima_leitura.sensor_1_cm,
+                    "sensor_2_cm": ultima_leitura.sensor_2_cm,
+                    "sensor_3_cm": ultima_leitura.sensor_3_cm
+                },
+                "distancia_media_cm": ultima_leitura.distancia_media_cm,
+                "capacidade_porcentagem": ultima_leitura.capacidade_porcentagem,
+                "status_codigo": ultima_leitura.status_codigo,
+                "status_mensagem": ultima_leitura.status_mensagem,
+                "status_bateria": ultima_leitura.status_bateria,
+                "qualidade_conexao": getattr(ultima_leitura, 'qualidade_conexao', 'Boa (Estável)'),
+                "timestamp": ultima_leitura.timestamp.isoformat()
+            })
+
         return jsonify(resultado), 200
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
