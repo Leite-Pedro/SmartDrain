@@ -21,9 +21,12 @@ import json
 import paho.mqtt.client as mqtt
 from datetime import datetime
 
-BROKER = "broker.hivemq.com"
-PORT = 1883
-TOPIC = "santa_rita/smart_drain/telemetria"
+import mqtt_config
+
+# Mesma fonte que a API usa, para os dois nunca acabarem em brokers diferentes.
+BROKER = mqtt_config.BROKER_URL
+PORT = mqtt_config.BROKER_PORT
+TOPIC = mqtt_config.TOPICO_TELEMETRIA
 ALTURA_CESTO = 80
 
 BUEIROS_CONFIG = [
@@ -78,10 +81,11 @@ try:
 except AttributeError:
     client = mqtt.Client()
 
+mqtt_config.preparar(client)
 client.connect(BROKER, PORT, 60)
 client.loop_start()
 
-print("[*] Simulador de Bueiros Inteligentes ATIVO.")
+print(f"[*] Simulador de Bueiros Inteligentes ATIVO em {mqtt_config.descricao()}")
 
 try:
     while True:

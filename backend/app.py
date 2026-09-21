@@ -19,6 +19,7 @@ from sqlalchemy import text
 from dotenv import load_dotenv
 from models import db, Usuario, Telemetria, Manutencao, BueiroCadastro
 import previsao
+import mqtt_config
 
 load_dotenv()
 
@@ -45,10 +46,13 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     "pool_pre_ping": True
 }
  
-MQTT_BROKER_URL = 'broker.hivemq.com'
-MQTT_BROKER_PORT = 1883
-MQTT_KEEPALIVE = 60
-MQTT_TOPIC_TELEMETRIA = "santa_rita/smart_drain/telemetria"
+# Broker, porta, credenciais e topico saem do .env (veja mqtt_config.py). O
+# padrao continua sendo o broker publico, entao quem nao configurar nada roda
+# como sempre.
+MQTT_BROKER_URL = mqtt_config.BROKER_URL
+MQTT_BROKER_PORT = mqtt_config.BROKER_PORT
+MQTT_KEEPALIVE = mqtt_config.KEEPALIVE
+MQTT_TOPIC_TELEMETRIA = mqtt_config.TOPICO_TELEMETRIA
 MQTT_CLIENT_ID = f'smart_drain_backend_{random.randint(10000, 99999)}'
 
 # O app já trava o botão a 3 m, mas isso é só no cliente: quem chamar a API direto
@@ -145,7 +149,7 @@ configuracoes_sistema = {
  
 def handle_connect(client, userdata, flags, reason_code, properties=None):
     if reason_code == 0:
-        print("[+] Backend conectado com sucesso ao Broker MQTT (broker.hivemq.com)!", flush=True)
+        print(f"[+] Backend conectado ao Broker MQTT: {mqtt_config.descricao()}", flush=True)
         client.subscribe(MQTT_TOPIC_TELEMETRIA)
         print(f"[*] Inscrito no tópico '{MQTT_TOPIC_TELEMETRIA}' com sucesso.", flush=True)
     else:
@@ -245,6 +249,8 @@ mqtt_client.on_disconnect = handle_disconnect
 mqtt_client.on_message = handle_mqtt_message
  
 try:
+    # TLS e usuario/senha, quando houver — antes de connect().
+    mqtt_config.preparar(mqtt_client)
     mqtt_client.connect(MQTT_BROKER_URL, MQTT_BROKER_PORT, MQTT_KEEPALIVE)
     mqtt_client.loop_start()
 except Exception as e:

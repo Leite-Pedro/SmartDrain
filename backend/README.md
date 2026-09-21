@@ -106,6 +106,7 @@ autenticação (sem header, malformado, adulterado, expirado, válido).
 `santa_rita/smart_drain/comandos`. Com hardware ligado, isso destrava fechadura
 de verdade — e qualquer pessoa no mundo pode publicar nesse tópico.
 
-Quando houver broker próprio, muda só o bloco de constantes MQTT no topo de
-`app.py` mais um `mqtt_client.username_pw_set(...)`, de preferência com as
-credenciais vindo do `.env`.
+Para usar um broker próprio não se mexe mais em código: preencha no `.env` as
+quatro variáveis `MQTT_*` documentadas em `.env.example`. Basta `MQTT_USUARIO`
+estar preenchido para ligar TLS e autenticação juntos. Apagar as linhas volta
+ao broker público.
