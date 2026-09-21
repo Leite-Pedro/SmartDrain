@@ -30,11 +30,26 @@ TOPIC = mqtt_config.TOPICO_TELEMETRIA
 ALTURA_CESTO = 80
 
 BUEIROS_CONFIG = [
-    {"id": "bueiro_centro_01", "latitude": -22.256280, "longitude": -45.697749},
-    {"id": "bueiro_centro_02", "latitude": -22.257810, "longitude": -45.697985},
-    {"id": "bueiro_centro_03", "latitude": -22.258405, "longitude": -45.694863},
-    {"id": "bueiro_centro_04", "latitude": -22.255090, "longitude": -45.695755},
-    {"id": "bueiro_centro_05", "latitude": -22.259291, "longitude": -45.696831}
+    # Inatel
+    {"id": "BUEIRO-01-INATEL", "latitude": -22.25628, "longitude": -45.697749},
+    {"id": "BUEIRO-02-INATEL", "latitude": -22.25781, "longitude": -45.697985},
+    {"id": "BUEIRO-03-INATEL", "latitude": -22.258405, "longitude": -45.694863},
+    {"id": "BUEIRO-04-INATEL", "latitude": -22.25509, "longitude": -45.695755},
+    {"id": "BUEIRO-05-INATEL", "latitude": -22.259291, "longitude": -45.696831},
+
+    # Fernandes
+    {"id": "BUEIRO-01-FERNANDES", "latitude": -22.240962, "longitude": -45.713277},
+    {"id": "BUEIRO-02-FERNANDES", "latitude": -22.243269, "longitude": -45.714515},
+    {"id": "BUEIRO-03-FERNANDES", "latitude": -22.243075, "longitude": -45.711883},
+    {"id": "BUEIRO-04-FERNANDES", "latitude": -22.240591, "longitude": -45.713365},
+    {"id": "BUEIRO-05-FERNANDES", "latitude": -22.243688, "longitude": -45.714166},
+
+    # Maristela
+    {"id": "BUEIRO-01-MARISTELA", "latitude": -22.243323, "longitude": -45.708798},
+    {"id": "BUEIRO-02-MARISTELA", "latitude": -22.243613, "longitude": -45.706920},
+    {"id": "BUEIRO-03-MARISTELA", "latitude": -22.244907, "longitude": -45.710343},
+    {"id": "BUEIRO-04-MARISTELA", "latitude": -22.241440, "longitude": -45.708667},
+    {"id": "BUEIRO-05-MARISTELA", "latitude": -22.243305, "longitude": -45.707146},
 ]
 
 OPCOES_CONEXAO = [
