@@ -40,15 +40,33 @@ class Bueiro {
   /// Qualquer status novo do backend entra na fila até alguém dizer o contrário.
   bool get precisaLimpeza => statusCodigo != 'TRANQUILO';
 
-  /// O id chega como "bueiro_centro_02" — é o único rótulo que o backend manda,
-  /// então região e nome saem dele. Id fora do padrão cai em 'outros' em vez de
-  /// estourar: bueiro cadastrado torto ainda precisa aparecer na lista.
-  List<String> get _partes => bueiroId.split('_');
+  /// O id é o único rótulo que o backend manda, então bairro e nome saem dele.
+  /// O projeto já usou dois formatos, e os dois convivem no banco:
+  ///
+  ///     BUEIRO-01-INATEL   ->  INATEL 01   (atual)
+  ///     bueiro_centro_01   ->  CENTRO 01   (leituras antigas)
+  ///
+  /// Por isso a regra não é "pegue a posição 1": separa por hífen ou
+  /// sublinhado e pega o primeiro pedaço que não é número, pulando o prefixo.
+  /// Id fora do padrão cai em OUTROS em vez de estourar — bueiro cadastrado
+  /// torto ainda precisa aparecer na lista.
+  List<String> get _partes =>
+      bueiroId.split(RegExp(r'[-_]')).where((p) => p.isNotEmpty).toList();
 
-  String get regiao => _partes.length >= 2 ? _partes[1] : 'outros';
+  String get regiao {
+    for (final parte in _partes.skip(1)) {
+      if (int.tryParse(parte) == null) return parte.toUpperCase();
+    }
+    return 'OUTROS';
+  }
 
-  /// "bueiro_centro_02" não é como o funcionário chama a coisa na rua.
-  String get nomeLegivel => _partes.length >= 3
-      ? '${_partes[1]} ${_partes[2]}'.toUpperCase()
-      : bueiroId.toUpperCase();
+  /// "BUEIRO-01-INATEL" não é como o funcionário chama a coisa na rua.
+  String get nomeLegivel {
+    final numero = _partes.skip(1).firstWhere(
+          (p) => int.tryParse(p) != null,
+          orElse: () => '',
+        );
+    if (regiao == 'OUTROS') return bueiroId.toUpperCase();
+    return numero.isEmpty ? regiao : '$regiao $numero';
+  }
 }
