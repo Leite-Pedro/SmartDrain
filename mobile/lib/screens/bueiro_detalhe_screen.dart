@@ -472,7 +472,11 @@ class _BlocoAproximacao extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          const Text('O botão libera a menos de 3 metros.', style: AppText.corpo),
+          // Sai da constante, nao escrito a mao: este texto ficou dizendo 3
+          // metros depois que o raio virou 15, e mandava o funcionario chegar
+          // mais perto do que precisa.
+          Text('O botão libera a menos de ${_raioLiberacaoMetros.toStringAsFixed(0)} metros.',
+              style: AppText.corpo),
         ],
       ),
     );
