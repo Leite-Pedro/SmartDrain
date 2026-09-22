@@ -223,7 +223,7 @@ class _PintorFaixa extends CustomPainter {
 
     final pincel = Paint()..color = AppColors.piche;
     const largura = 14.0;
-    // Diagonais na mesma inclinação de barreira de obra.
+    // Diagonais herdadas da faixa de barreira de obra, agora em azul e slate.
     for (double x = -size.height;
         x < size.width + size.height;
         x += largura * 2) {

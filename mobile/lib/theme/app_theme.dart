@@ -4,26 +4,39 @@ import 'package:flutter/material.dart';
 /// Paleta do Smart Drain.
 ///
 /// Tema claro de propósito: o app é usado na rua, sob sol direto, onde fundo
-/// escuro desperdiça o brilho da tela. As cores vêm do próprio ambiente de
-/// trabalho — concreto, piche e o laranja de sinalização do colete.
+/// escuro desperdiça o brilho da tela.
+///
+/// As cores são as mesmas da dashboard — azul e a família de cinzas slate do
+/// Tailwind — para que app e site pareçam o mesmo produto. Quem vê os dois na
+/// mesma apresentação não deve ter dúvida de que são o mesmo sistema.
+///
+/// Os nomes vieram da paleta anterior, de obra. Foram mantidos porque são
+/// usados em dez arquivos e renomear seria só barulho no diff; leia-os como
+/// papéis (fundo, texto, acento), não como cores literais.
 class AppColors {
   AppColors._();
 
-  static const Color concreto = Color(0xFFE4E6E3); // fundo, cinza de calçada
+  static const Color concreto = Color(0xFFF8FAFC); // fundo (slate-50)
   static const Color superficie = Color(0xFFFFFFFF); // cartões
-  static const Color piche = Color(0xFF16181A); // texto principal
-  static const Color fumaca = Color(0xFF5F6570); // texto secundário
-  static const Color borda = Color(0xFFD2D5D1);
+  static const Color piche = Color(0xFF0F172A); // texto principal (slate-900)
+  static const Color fumaca = Color(0xFF64748B); // texto secundário (slate-500)
+  static const Color borda = Color(0xFFE2E8F0); // slate-200
 
-  /// Acento único. Laranja de cone e colete — é o que o funcionário já veste.
-  /// Sempre com texto [piche] em cima: preto sobre laranja é linguagem de placa
-  /// de obra, e o contraste passa em acessibilidade (branco não passaria).
-  static const Color sinal = Color(0xFFFF4D00);
+  /// Acento único, o mesmo azul da dashboard (blue-600 do Tailwind).
+  ///
+  /// Sempre com texto BRANCO em cima. Preto sobre este azul dá 4,3:1 e reprova
+  /// em acessibilidade para texto normal; branco dá 5,2:1 e passa. Era o
+  /// contrário no laranja anterior, então quem mexer aqui precisa conferir de
+  /// novo — não é detalhe de gosto.
+  static const Color sinal = Color(0xFF2563EB);
 
-  // Níveis de obstrução. Escuros o bastante para ler ao sol sobre branco.
-  static const Color nivelOk = Color(0xFF2F7A4F);
-  static const Color nivelAlerta = Color(0xFFB4690E);
-  static const Color nivelCritico = Color(0xFFB3261E);
+  // Níveis de obstrução, nas mesmas famílias da dashboard (emerald, amber e
+  // red), mas no tom 700 em vez do 500: os rótulos de status têm 11 px, e o
+  // tom claro do site reprovaria em contraste nesse tamanho. Mesma cor de
+  // longe, legível de perto e ao sol.
+  static const Color nivelOk = Color(0xFF047857);
+  static const Color nivelAlerta = Color(0xFFB45309);
+  static const Color nivelCritico = Color(0xFFB91C1C);
 
   /// Cor do nível a partir do código de status vindo do sensor.
   static Color doStatus(String statusCodigo) {
@@ -95,7 +108,7 @@ class AppTheme {
       scaffoldBackgroundColor: AppColors.concreto,
       colorScheme: const ColorScheme.light(
         primary: AppColors.sinal,
-        onPrimary: AppColors.piche,
+        onPrimary: Colors.white,
         surface: AppColors.superficie,
         onSurface: AppColors.piche,
         error: AppColors.nivelCritico,
@@ -140,7 +153,7 @@ class AppTheme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.sinal,
-          foregroundColor: AppColors.piche,
+          foregroundColor: Colors.white,
           disabledBackgroundColor: AppColors.borda,
           disabledForegroundColor: AppColors.fumaca,
           elevation: 0,
