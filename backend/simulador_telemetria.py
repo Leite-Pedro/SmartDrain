@@ -21,9 +21,12 @@ from datetime import datetime
 
 import paho.mqtt.client as paho_mqtt
 
-BROKER = 'broker.hivemq.com'
-PORTA = 1883
-TOPICO = 'santa_rita/smart_drain/telemetria'
+import mqtt_config
+
+# Mesma fonte que a API usa, para os dois nunca acabarem em brokers diferentes.
+BROKER = mqtt_config.BROKER_URL
+PORTA = mqtt_config.BROKER_PORT
+TOPICO = mqtt_config.TOPICO_TELEMETRIA
 
 # Coordenadas reais dos bueiros cadastrados, para a leitura não cair no oceano.
 BUEIROS = {
@@ -77,6 +80,7 @@ def main():
     dados = payload(bueiro_id, capacidade, latitude, longitude)
 
     cliente = paho_mqtt.Client(paho_mqtt.CallbackAPIVersion.VERSION2)
+    mqtt_config.preparar(cliente)
     cliente.connect(BROKER, PORTA, 60)
     cliente.loop_start()
     info = cliente.publish(TOPICO, json.dumps(dados))

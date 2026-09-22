@@ -2,3 +2,5 @@
 .venv/
 __pycache__/
 uploads/
+# Limites por bairro ajustados na dashboard: estado de execucao, de cada maquina.
+configuracoes.json

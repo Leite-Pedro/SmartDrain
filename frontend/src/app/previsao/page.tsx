@@ -57,10 +57,16 @@ interface EstadoClima {
   alertaVolume: number;
 }
 
-// "bueiro_centro_03" não é nome de lugar nenhum.
+// O id e o unico rotulo que o backend manda, e o projeto ja usou dois formatos
+// que convivem no banco: BUEIRO-01-INATEL e bueiro_centro_01. Por isso a regra
+// nao e "pegue a posicao 1": separa por hifen ou sublinhado e pega o primeiro
+// pedaco que nao e numero.
 function nomeLegivel(id: string) {
-  const partes = id.split("_");
-  return partes.length >= 3 ? `${partes[1]} ${partes[2]}`.toUpperCase() : id.toUpperCase();
+  const partes = id.split(/[-_]/).filter(Boolean);
+  const bairro = partes.slice(1).find((p) => Number.isNaN(Number(p)));
+  const numero = partes.slice(1).find((p) => !Number.isNaN(Number(p)));
+  if (!bairro) return id.toUpperCase();
+  return numero ? `${bairro} ${numero}`.toUpperCase() : bairro.toUpperCase();
 }
 
 const CORES_NIVEL: Record<string, string> = {
