@@ -71,15 +71,24 @@ void main() {
     });
   });
 
-  group('regiao', () {
-    test('sai do meio do id', () {
-      expect(Bueiro.fromJson(_json()).regiao, 'centro');
+  group('regiao e nomeLegivel', () {
+    Bueiro comId(String id) => Bueiro.fromJson(_json()..['bueiro_id'] = id);
+
+    test('formato atual: BUEIRO-01-INATEL', () {
+      // O bairro vem depois do numero, entao pegar a posicao 1 daria "01".
+      expect(comId('BUEIRO-01-INATEL').regiao, 'INATEL');
+      expect(comId('BUEIRO-01-INATEL').nomeLegivel, 'INATEL 01');
+      expect(comId('BUEIRO-05-MARISTELA').regiao, 'MARISTELA');
+    });
+
+    test('formato antigo continua lido, ainda tem leitura no banco', () {
+      expect(comId('bueiro_centro_02').regiao, 'CENTRO');
+      expect(comId('bueiro_centro_02').nomeLegivel, 'CENTRO 02');
     });
 
     test('id fora do padrão não derruba o filtro', () {
-      final b = Bueiro.fromJson(_json()..['bueiro_id'] = 'avulso');
-      expect(b.regiao, 'outros');
-      expect(b.nomeLegivel, 'AVULSO');
+      expect(comId('avulso').regiao, 'OUTROS');
+      expect(comId('avulso').nomeLegivel, 'AVULSO');
     });
   });
 
