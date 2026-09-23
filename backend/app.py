@@ -205,6 +205,14 @@ def handle_mqtt_message(client, userdata, message):
                 }
             )
  
+            # De quanto era a leitura passada deste bueiro, para saber se ele
+            # acabou de ser limpo. Consultar depois do add() nao serve: o
+            # autoflush ja teria gravado a leitura nova.
+            anterior = db.session.query(Telemetria.capacidade_porcentagem).filter(
+                Telemetria.bueiro_id == bueiro_id
+            ).order_by(Telemetria.id.desc()).first()
+            anterior_porcentagem = anterior[0] if anterior else None
+
             nova_leitura = Telemetria(
                 bueiro_id=bueiro_id,
                 latitude=dados['latitude'],
@@ -222,7 +230,11 @@ def handle_mqtt_message(client, userdata, message):
             )
             db.session.add(nova_leitura)
  
-            if capacidade == 0:
+            # Registra a limpeza na transicao, nao no estado: so quando o
+            # bueiro estava com alguma obstrucao e agora zerou. Antes bastava
+            # a leitura marcar 0%, entao bueiro vazio publicando de 30 em 30 s
+            # gerava uma "limpeza" a cada leitura, assinada Equipe de Campo.
+            if capacidade == 0 and anterior_porcentagem not in (None, 0):
                 nova_limpeza = Manutencao(
                     bueiro_id=bueiro_id,
                     tecnico_nome="Equipe de Campo",
@@ -623,11 +635,18 @@ def obter_graficos_dinamicos():
             db.extract('year', Manutencao.timestamp) == ano_alvo
         ).count()
  
-        enchentes = Telemetria.query.filter(
+        # Um transbordamento e um bueiro num dia, nao cada leitura que chegou
+        # enquanto ele estava cheio: o bueiro publica a cada poucos segundos,
+        # entao contar linha transformava uma tarde de enchente em centenas de
+        # "ocorrencias". Dia e o recorte que a prefeitura usa para contar.
+        enchentes = db.session.query(
+            Telemetria.bueiro_id,
+            db.func.date(Telemetria.timestamp)
+        ).filter(
             Telemetria.status_codigo == 'ENCHENTE',
             db.extract('month', Telemetria.timestamp) == mes_alvo,
             db.extract('year', Telemetria.timestamp) == ano_alvo
-        ).count()
+        ).distinct().count()
  
         dados_grafico.append({
             "mes": meses_pt[mes_alvo - 1],
