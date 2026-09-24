@@ -1,0 +1,17 @@
+# Versoes congeladas do ambiente que roda a demonstracao, para outra maquina
+# subir a API sem descobrir pacote por pacote.
+#
+#   python3 -m venv .venv
+#   source .venv/bin/activate        (Windows: .venv\Scripts\activate)
+#   pip install -r requirements.txt
+#
+# psycopg2-binary traz o driver ja compilado, inclusive para Apple Silicon.
+Flask==3.1.3
+flask-cors==6.0.5
+Flask-SQLAlchemy==3.1.1
+SQLAlchemy==2.0.51
+psycopg2-binary==2.9.12
+paho-mqtt==2.1.0
+python-dotenv==1.2.2
+itsdangerous==2.2.0
+pillow==12.3.0
