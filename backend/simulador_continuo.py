@@ -36,6 +36,8 @@ BUEIROS_CONFIG = [
     {"id": "BUEIRO-03-INATEL", "latitude": -22.258405, "longitude": -45.694863},
     {"id": "BUEIRO-04-INATEL", "latitude": -22.25509, "longitude": -45.695755},
     {"id": "BUEIRO-05-INATEL", "latitude": -22.259291, "longitude": -45.696831},
+    {"id": "BUEIRO-06-INATEL", "latitude": -22.256969093155103, "longitude": -45.6965221251422},   # entrada
+    {"id": "BUEIRO-07-INATEL", "latitude": -22.256215226756755, "longitude": -45.695619623718294},  # entre predio 3 e 4
 
     # Fernandes
     {"id": "BUEIRO-01-FERNANDES", "latitude": -22.240962, "longitude": -45.713277},

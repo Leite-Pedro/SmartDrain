@@ -18,7 +18,7 @@ interface BueiroData {
   longitude: number;
   status_bateria: number;
   qualidade_conexao: string;
-  status_codigo: "TRANQUILO" | "ALERTA" | "CRITICO";
+  status_codigo: "TRANQUILO" | "ALERTA" | "CRITICO" | "ENCHENTE";
   timestamp: string;
 }
 
@@ -72,17 +72,22 @@ export default function Dispositivos() {
     return 25; // Ruim
   };
 
-  // Adapta o status de negócio da API para a etiqueta visual do Card
+  // A etiqueta diz o quanto o bueiro está obstruído, e não se o aparelho está
+  // conectado — bateria e sinal aparecem logo abaixo, no mesmo cartão. Antes
+  // dizia ONLINE/OFFLINE: um bueiro entupido saía como desconectado, com o
+  // ping do mesmo segundo dos outros logo ali embaixo desmentindo.
   const getStatusDisplay = (status_codigo: string) => {
     switch (status_codigo) {
       case "TRANQUILO":
-        return { text: "ONLINE", class: "bg-emerald-500/10 text-emerald-600" };
+        return { text: "LIVRE", class: "bg-emerald-500/10 text-emerald-600" };
       case "ALERTA":
-        return { text: "WARNING", class: "bg-yellow-500/10 text-yellow-600" };
+        return { text: "ATENÇÃO", class: "bg-yellow-500/10 text-yellow-600" };
       case "CRITICO":
-        return { text: "OFFLINE", class: "bg-red-500/10 text-red-600" };
+        return { text: "CRÍTICO", class: "bg-red-500/10 text-red-600" };
+      case "ENCHENTE":
+        return { text: "TRANSBORDANDO", class: "bg-red-500/20 text-red-600" };
       default:
-        return { text: "UNKNOWN", class: "bg-slate-500/10 text-slate-600" };
+        return { text: "SEM DADOS", class: "bg-slate-500/10 text-slate-600" };
     }
   };
 
@@ -128,7 +133,7 @@ export default function Dispositivos() {
                   </p>
                 </div>
                 <span
-                  className={`px-3 py-1 rounded-full text-xs font-bold ${statusVis.class}`}
+                  className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap shrink-0 ${statusVis.class}`}
                 >
                   {statusVis.text}
                 </span>
