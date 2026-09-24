@@ -1,0 +1,3 @@
+# Script de shell quebra com fim de linha do Windows:
+# "bad interpreter: /bin/bash^M". Mantem LF em qualquer maquina.
+*.sh text eol=lf
